@@ -1,0 +1,94 @@
+
+  EPSON TM Series Printer Driver for Linux Version 3.0.0
+
+                         Copyright (C) Seiko Epson Corporation 2019.
+
+
+1. GENERAL
+----------
+  This software is a printer driver for printing on an Epson
+  TM series printer from Linux using CUPS.
+
+  1.1) Features
+    + A raster type printer driver for TM series printers.
+    + Can instantly print out images, texts and drawings displayed by
+      an application.
+    + Various printer controls on paper cut timing, cash drawers,
+      printing speed, blank line saving, inverted printing, etc.
+
+2. ENVIRONMENT
+--------------
+  2.1) Supported printers
+    + EPSON TM-H6000IV
+      * USB connection is not supported.
+
+  2.2) Confirmed distributions
+    + Ubuntu 18.04
+    + CentOS 7 1810
+    + openSUSE 13.1
+
+3. FILES
+--------
+  + README .......... This file
+  + LISENSE ......... GNU GENERAL PUBLIC LICENSE
+  + build.sh ........ Build script
+  + install.sh ...... Installation script
+  + CMakeList.txt ... input file of cmake
+  + /filter ......... source code of filter driver
+  + /ppd ............ ppd files
+
+4. HOW TO BUILD & INSTALL
+-------------------------
+  Ensure that you have following packages pre-installed
+   + Ubuntu ..... cmake, libcupsimage2-dev development
+   + CentOS ..... cmake, gcc, gcc-c++, cups-devel development
+   + openSUSE ... cmake, gcc, gcc-c++, cups-devel development
+
+  4.1) Execute build script
+    #sudo ./build.sh
+
+    *Temporary folder build will be made when run script.
+
+  !!! You must the following install script with root privileges. !!!
+
+  4.2) Execute installation script
+    #sudo ./install.sh
+
+    *Filter driver and ppd files will be copied to appropriate folders.
+
+5. HOW TO PRINT
+---------------
+5.1 By command line
+  1) Turn on printer
+     Turn the printer on before registering a printer.
+  2) Register a printer
+    !!! You must run lpadmin command with root privilege. !!!
+      #lpadmin -p <destination> -v <device-uri> -P <ppd-file> -E
+      -p <destination>
+      -v <device-uri>
+      -P <ppd-file>
+      -E 
+
+    example)
+      #lpadmin -p TM-H6000IV -v socket://192.168.192.168/TM-H6000IV -P tm-impact-receipt-rastertotmis.ppd -E
+
+  3) Print a file
+    !!! You must always specify media options !!!
+      $lpr -o <option> -P <printer> <file>
+    example)
+      $lpr -o media=CS230x297 -P TM-H6000IV sample.pdf
+
+5.2 by GUI
+  Add a queue using OS tool & test print by GUI
+    http://localhost:631 or http://127.0.0.1:631
+
+6. LIMITATIONS
+--------------
+  + Support USB printer class only.
+     Please configure printer class support manually.
+
+7. HISTORY
+----------
+  + 2019/2/15 Version 3.0.0
+
+[EOF]
