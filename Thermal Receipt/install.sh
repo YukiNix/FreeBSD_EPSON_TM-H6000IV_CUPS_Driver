@@ -14,21 +14,21 @@ then
     exit 1
 fi
 
-SERVERROOT=$(grep '^ServerRoot' /etc/cups/cupsd.conf | awk '{print $2}')
+SERVERROOT=$(grep '^ServerRoot' /usr/local/etc/cups/cups-files.conf | awk '{print $2}')
 
 if [ -z $FILTERDIR ] || [ -z $PPDDIR ]
 then
-    echo "Searching for ServerRoot, ServerBin, and DataDir tags in /etc/cups/cupsd.conf"
+    echo "Searching for ServerRoot, ServerBin, and DataDir tags in /usr/local/etc/cups/cups-files.conf"
     echo ""
 
     if [ -z $FILTERDIR ]
     then
-        SERVERBIN=$(grep '^ServerBin' /etc/cups/cupsd.conf | awk '{print $2}')
+        SERVERBIN=$(grep '^ServerBin' /usr/local/etc/cups/cups-files.conf | awk '{print $2}')
 
         if [ -z $SERVERBIN ]
         then
             echo "ServerBin tag not present in cupsd.conf - using default"
-            FILTERDIR=/usr/lib/cups/filter
+            FILTERDIR=/usr/local/libexec/cups/filter
         elif [ ${SERVERBIN:0:1} = "/" ]
         then
             echo "ServerBin tag is present as an absolute path"
@@ -43,12 +43,12 @@ then
 
     if [ -z $PPDDIR ]
     then
-        DATADIR=$(grep '^DataDir' /etc/cups/cupsd.conf | awk '{print $2}')
+        DATADIR=$(grep '^DataDir' /usr/local/etc/cups/cups-files.conf | awk '{print $2}')
 
         if [ -z $DATADIR ]
         then
             echo "DataDir tag not present in cupsd.conf - using default"
-            PPDDIR=/usr/share/cups/model/EPSON
+            PPDDIR=/usr/local/share/cups/model/EPSON
         elif [ ${DATADIR:0:1} = "/" ]
         then
             echo "DataDir tag is present as an absolute path"
@@ -76,46 +76,8 @@ $INSTALL -m 755 -d $PPDDIR
 $INSTALL -m 755 ./ppd/*.ppd $PPDDIR 
 echo ""
 
-if [ -z $RPMBUILD ]
-then
-    echo "Restarting CUPS"
-    if [ -x /etc/software/init.d/cups ]
-    then
-        /etc/software/init.d/cups stop
-        /etc/software/init.d/cups start
-    elif [ -x /etc/rc.d/init.d/cups ]
-    then
-        /etc/rc.d/init.d/cups stop
-        /etc/rc.d/init.d/cups start
-    elif [ -x /etc/init.d/cups ]
-    then
-        /etc/init.d/cups stop
-        /etc/init.d/cups start
-    elif [ -x /sbin/init.d/cups ]
-    then
-        /sbin/init.d/cups stop
-        /sbin/init.d/cups start
-    elif [ -x /etc/software/init.d/cupsys ]
-    then
-        /etc/software/init.d/cupsys stop
-        /etc/software/init.d/cupsys start
-    elif [ -x /etc/rc.d/init.d/cupsys ]
-    then
-        /etc/rc.d/init.d/cupsys stop
-        /etc/rc.d/init.d/cupsys start
-    elif [ -x /etc/init.d/cupsys ]
-    then
-        /etc/init.d/cupsys stop
-        /etc/init.d/cupsys start
-    elif [ -x /sbin/init.d/cupsys ]
-    then
-        /sbin/init.d/cupsys stop
-        /sbin/init.d/cupsys start
-    else
-        echo "Could not restart CUPS"
-    fi
-    echo ""
-fi
+echo "Restarting CUPS"
+service cupsd restart
 
 echo "Installation Completed"
 echo "Add a printer queue using OS tool, http://localhost:631, or http://127.0.0.1:631"
